@@ -6,9 +6,37 @@ import logo from "./images/logo.png";
 /*
 登陆路由组件
 */
-export default class Login extends Component {
-  handleSubmit = (event) => {};
+class Login extends Component {
+  handleSubmit = (event) => {
+    event.preventDefault();
+    const { validateFields } = this.props.form;
+    validateFields((err, values) => {
+      if (!err) {
+        console.log("Received values from form :", values);
+      } else {
+        console.log("校验失败");
+      }
+    });
+  };
+  /*
+    对密码进行自定义验证
+  */
+  validatePwd = (rule, value, callback) => {
+    if (!value) {
+      callback("必须输入密码");
+    } else if (value.length < 4) {
+      callback("密码长度不能小于4位");
+    } else if (value.length > 12) {
+      callback("密码的长度不能大于12位");
+    } else if (!/^[a-zA-Z0-9_ ]+$/.test(value)) {
+      callback("必以数字或者字母、下划线组成");
+    } else {
+      callback();
+    }
+  };
   render() {
+    const { Item } = Form;
+    const { getFieldDecorator } = this.props.form;
     return (
       <div className="login">
         <header className="login-header">
@@ -22,34 +50,48 @@ export default class Login extends Component {
             name="normal_login"
             className="login-form"
           >
-            <Form.Item
-              name="username"
-              rules={[
-                { required: true, message: "Please input your Username!" },
-              ]}
-            >
-              <Input
-                prefix={
-                  <Icon type="user" style={{ color: "rgba(0,0,0,.25" }} />
-                }
-                placeholder="Username"
-              />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              rules={[
-                { required: true, message: "Please input your Password!" },
-              ]}
-            >
-              <Input
-                type="password"
-                placeholder="Password"
-                prefix={
-                  <Icon type="lock" style={{ color: "rgba(0,0,0,.25" }} />
-                }
-              />
-            </Form.Item>
-            <Form.Item>
+            <Item name="username">
+              {getFieldDecorator("username", {
+                rules: [
+                  {
+                    required: true,
+                    whitespace: true,
+                    message: "请输入用户名!",
+                  },
+                  { min: 4, message: "用户名至少4位" },
+                  { max: 12, message: "用户名至多12位" },
+                  {
+                    pattern: /^[a-zA-Z0-9_ ]+$/,
+                    message: "用户名必须是英文，数字或者下划线组成",
+                  },
+                ],
+              })(
+                <Input
+                  prefix={
+                    <Icon type="user" style={{ color: "rgba(0,0,0,.25" }} />
+                  }
+                  placeholder="Username"
+                />
+              )}
+            </Item>
+            <Item name="password">
+              {getFieldDecorator("password", {
+                rules: [
+                  {
+                    validator: this.validatePwd,
+                  },
+                ],
+              })(
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  prefix={
+                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25" }} />
+                  }
+                />
+              )}
+            </Item>
+            <Item>
               <Button
                 type="primary"
                 htmlType="submit"
@@ -57,10 +99,14 @@ export default class Login extends Component {
               >
                 登录
               </Button>
-            </Form.Item>
+            </Item>
           </Form>
         </section>
       </div>
     );
   }
 }
+
+const WrapLogin = Form.create()(Login);
+
+export default WrapLogin;
