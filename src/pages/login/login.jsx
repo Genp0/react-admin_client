@@ -52,6 +52,7 @@ class Login extends Component {
           >
             <Item name="username">
               {getFieldDecorator("username", {
+                initialValue: "admin",
                 rules: [
                   {
                     required: true,
