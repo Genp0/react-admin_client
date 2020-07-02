@@ -1,7 +1,9 @@
 import React, { Component } from "react";
-import { Form, Input, Button, Icon } from "antd";
+import { Form, Input, Button, Icon, message } from "antd";
 import "./login.less";
 import logo from "./images/logo.png";
+import { reqLogin } from "../../api/index";
+import memoryUtils from "../../utils/memoryUtils";
 
 /*
 登陆路由组件
@@ -10,9 +12,17 @@ class Login extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     const { validateFields } = this.props.form;
-    validateFields((err, values) => {
+    validateFields(async (err, values) => {
       if (!err) {
-        console.log("Received values from form :", values);
+        const { username, password } = values;
+        const result = await reqLogin(username, password);
+        if (result.status === 0) {
+          message.success("登录成功");
+          memoryUtils.user = result.data;
+          this.props.history.replace("/");
+        } else {
+          message.error(result.msg);
+        }
       } else {
         console.log("校验失败");
       }
