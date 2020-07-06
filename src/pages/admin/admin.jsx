@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import memoryUtils from "../../utils/memoryUtils";
 import { Redirect } from "react-router-dom";
+import { Layout } from "antd";
+import memoryUtils from "../../utils/memoryUtils";
+const { Header, Footer, Sider, Content } = Layout;
 /*
 管理路由组件
 */
