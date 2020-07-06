@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Form, Input, Button, Icon, message } from "antd";
+
 import "./login.less";
 import { Redirect } from "react-router-dom";
-import logo from "./images/logo.png";
+import logo from "../../assets/images/logo.png";
 import { reqLogin } from "../../api/index";
 import memoryUtils from "../../utils/memoryUtils";
 import storageUtils from "../../utils/storageUtils";
