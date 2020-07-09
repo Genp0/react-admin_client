@@ -5,7 +5,6 @@
 import ajax from "./ajax";
 import jsonp from "jsonp";
 import { message } from "antd";
-import { reject } from "lodash";
 const BASE = "";
 export const reqLogin = (username, password) =>
   ajax(BASE + "/login", { username, password }, "POST");
