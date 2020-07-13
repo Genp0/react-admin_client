@@ -5,6 +5,10 @@ import LinkButton from "../../components/link-button";
 export default class Category extends Component {
   state = {
     categorys: [], //一级分类列表
+    loading: false,
+    parentID: "0", // 当前需要显示的分类列表的parentId
+    parentName: "", // 分类名称
+    subCategorys: [], // 二级分类列表
   };
   /*
   初始化所有列的数组
@@ -18,23 +22,58 @@ export default class Category extends Component {
       title: "操作",
       width: 300,
       dataIndex: "",
-      render: () => (
+      render: (category) => (
         <span>
           <LinkButton>修改分类</LinkButton>
-          <LinkButton>查看子分类</LinkButton>
+          {this.state.parentID === "0" ? (
+            <LinkButton
+              onClick={() => {
+                this.showSubCategory(category);
+              }}
+            >
+              查看子分类
+            </LinkButton>
+          ) : null}
         </span>
       ),
     },
   ];
 
   getCategory = async () => {
-    let result = await reqCategory("0");
+    this.setState({ loading: true });
+    const { parentID } = this.state;
+    let result = await reqCategory(parentID);
+    this.setState({ loading: false });
     if (result.status === 0) {
       const categorys = result.data;
-      this.setState({ categorys });
+      if (parentID === "0") {
+        this.setState({ categorys });
+      } else {
+        this.setState({
+          subCategorys: categorys,
+        });
+      }
     } else {
       message.error("获取分类列表失败");
     }
+  };
+  showSubCategory = async (category) => {
+    this.setState(
+      {
+        parentID: category._id,
+        parentName: category.name,
+      },
+      () => {
+        this.getCategory();
+      }
+    );
+  };
+  showCategorys = () => {
+    this.setState({
+      parentID: "0",
+      parentName: "",
+      subCategorys: [],
+    });
   };
   componentWillMount() {
     this.columns = this.initColumn();
@@ -46,9 +85,24 @@ export default class Category extends Component {
     this.getCategory();
   }
   render() {
-    const { categorys } = this.state;
+    const {
+      categorys,
+      loading,
+      parentID,
+      subCategorys,
+      parentName,
+    } = this.state;
     // Card的左侧
-    const title = "一级分类列表";
+    const title =
+      parentID === "0" ? (
+        "一级分类列表"
+      ) : (
+        <span>
+          <LinkButton onClick={this.showCategorys}>一级分类列表</LinkButton>
+          <Icon type="arrow-right" style={{ marginRight: 5 }}></Icon>
+          <span>{parentName}</span>
+        </span>
+      );
     // Card的右侧
     const extra = (
       <Button type="primary">
@@ -63,10 +117,11 @@ export default class Category extends Component {
           <Table
             rowKey="_id"
             bordered
-            dataSource={categorys}
+            dataSource={parentID === "0" ? categorys : subCategorys}
             columns={this.columns}
+            loading={loading}
+            pagination={{ defaultPageSize: 5, showQuickJumper: true }}
           />
-          ;
         </Card>
       </div>
     );
