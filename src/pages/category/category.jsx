@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { reqCategory, reqAddCategory, reqUpdateCategory } from "../../api";
 import { Card, Table, Button, Icon, Modal, message } from "antd";
 import LinkButton from "../../components/link-button";
+import AddForm from "./add-form";
+import UpdateForm from "./update-form";
 export default class Category extends Component {
   state = {
     categorys: [], //一级分类列表
@@ -9,6 +11,7 @@ export default class Category extends Component {
     parentID: "0", // 当前需要显示的分类列表的parentId
     parentName: "", // 分类名称
     subCategorys: [], // 二级分类列表
+    showStatus: 0,
   };
   /*
   初始化所有列的数组
@@ -24,7 +27,9 @@ export default class Category extends Component {
       dataIndex: "",
       render: (category) => (
         <span>
-          <LinkButton>修改分类</LinkButton>
+          <LinkButton onClick={() => this.showUpdate(category)}>
+            修改分类
+          </LinkButton>
           {this.state.parentID === "0" ? (
             <LinkButton
               onClick={() => {
@@ -75,6 +80,56 @@ export default class Category extends Component {
       subCategorys: [],
     });
   };
+  handleCancel = () => {
+    // 清除数据
+    this.form.resetFields();
+    this.setState({ showStatus: 0 });
+  };
+  updateCategory = async () => {
+    // 1.隐藏确定框
+    this.setState({
+      showStatus: 0,
+    });
+    // 准备数据
+    const categoryId = this.category._id;
+    const categoryName = this.form.getFieldValue("categoryName");
+    this.form.resetFields();
+
+    // 2.发请求更新分类
+
+    const result = await reqUpdateCategory({ categoryId, categoryName });
+    if (result.status === 0) {
+      // 3.重新显示列表
+      console.log("成功了");
+      this.getCategory();
+    }
+  };
+  showUpdate = (category) => {
+    this.category = category;
+    this.setState({
+      showStatus: 2,
+    });
+  };
+  addCategory = async () => {
+    // 隐藏确认框
+    this.setState({ showStatus: 0 });
+    // 收集数据并提交分类请求
+    const { parentId, categoryName } = this.form.getFieldsValue();
+    this.form.resetFields();
+    let result = await reqAddCategory(categoryName, parentId);
+    if (result.status === 0) {
+      // 添加的分类就是当前分类列表
+      if (parentId === this.state.parentID) {
+        // 重新获取当前分类列表
+        this.getCategory();
+      }
+    }
+    //重新获取分类列表显示
+    this.getCategory();
+  };
+  showAdd = () => {
+    this.setState({ showStatus: 1 });
+  };
   componentWillMount() {
     this.columns = this.initColumn();
   }
@@ -91,7 +146,9 @@ export default class Category extends Component {
       parentID,
       subCategorys,
       parentName,
+      showStatus,
     } = this.state;
+    const category = this.category || {};
     // Card的左侧
     const title =
       parentID === "0" ? (
@@ -105,7 +162,7 @@ export default class Category extends Component {
       );
     // Card的右侧
     const extra = (
-      <Button type="primary">
+      <Button type="primary" onClick={this.showAdd}>
         <Icon type="plus" />
         添加
       </Button>
@@ -123,6 +180,31 @@ export default class Category extends Component {
             pagination={{ defaultPageSize: 5, showQuickJumper: true }}
           />
         </Card>
+        <Modal
+          title="更新分类"
+          visible={showStatus === 2}
+          onOk={this.updateCategory}
+          onCancel={this.handleCancel}
+        >
+          <UpdateForm
+            categoryName={category.name}
+            setForm={(form) => {
+              this.form = form;
+            }}
+          />
+        </Modal>
+        <Modal
+          title="添加分类"
+          visible={showStatus === 1}
+          onOk={this.addCategory}
+          onCancel={this.handleCancel}
+        >
+          <AddForm
+            parentId={parentID}
+            categorys={categorys}
+            setForm={(form) => (this.form = form)}
+          />
+        </Modal>
       </div>
     );
   }
