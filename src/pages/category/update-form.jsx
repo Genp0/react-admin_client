@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Select, Input } from "antd";
+import { Form, Input } from "antd";
 import PropTypes from "prop-types";
 const Item = Form.Item;
 class UpdateForm extends Component {
@@ -18,6 +18,7 @@ class UpdateForm extends Component {
         <Item>
           {getFieldDecorator("categoryName", {
             initialValue: categoryName,
+            rules: [{ required: true, message: "分类名称必须输入" }],
           })(<Input placeholder="请输入分类名称" />)}
         </Item>
       </Form>
