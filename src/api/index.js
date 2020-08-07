@@ -21,6 +21,26 @@ export const reqAddCategory = (categoryName, parentId) =>
 export const reqUpdateCategory = ({ categoryId, categoryName }) =>
   ajax(BASE + "/manage/category/update", { categoryId, categoryName }, "POST");
 
+// 获取商品分页列表
+export const reqProducets = (pageNum, pageSize) =>
+  ajax(BASE + "/manage/product/list", { pageNum, pageSize });
+/*
+ 搜索商品分页列表
+ searchType:搜索的类型，productName，ProductDesc
+ */
+export const reqSearchProduct = ({
+  pageNum,
+  pageSize,
+  searchName,
+  searchType,
+}) =>
+  ajax(BASE + "/manage/product/search", {
+    pageNum,
+    pageSize,
+    searchType,
+    [searchType]: searchName,
+  });
+
 export const reqWeather = (city) => {
   return new Promise((resolve, reject) => {
     const url = `http://api.map.baidu.com/telematics/v3/weather?location=${city}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`;
