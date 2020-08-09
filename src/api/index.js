@@ -12,7 +12,8 @@ export const reqLogin = (username, password) =>
 export const reqAddUser = (user) =>
   ajax(BASE + "/manager/user/add", user, "POST");
 
-export const reqCategory = (parentId) =>
+// 获取一级，二级分类列表
+export const reqCategorys = (parentId) =>
   ajax(BASE + "/manage/category/list", { parentId });
 
 export const reqAddCategory = (categoryName, parentId) =>
@@ -40,6 +41,13 @@ export const reqSearchProduct = ({
     searchType,
     [searchType]: searchName,
   });
+
+// 获取一个分类
+export const reqCategory = (categoryId) =>
+  ajax(BASE + "/manage/category/info", { categoryId });
+// 更新商品状态（上架/下架）
+export const reqUpdateStatus = (productId, status) =>
+  ajax(BASE + "/manage/product/updateStatus", { productId, status }, "POST");
 
 export const reqWeather = (city) => {
   return new Promise((resolve, reject) => {

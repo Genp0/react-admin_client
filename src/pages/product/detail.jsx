@@ -1,12 +1,56 @@
 import React, { Component } from "react";
-import { Button, Card, Icon, List } from "antd";
+import { Card, Icon, List } from "antd";
+import LinkButtom from "../../components/link-button";
+import { BASE_IMG_URL } from "../../utils/constants";
+import { reqCategory } from "../../api/index";
 import "./product.less";
 const Item = List.Item;
 class ProductDetail extends Component {
+  state = {
+    cName1: "", // 一级分类名称
+    cName2: "", // 二级分类名称
+  };
+  // 得到当前商品的分类ID
+  async componentDidMount() {
+    const { pCategoryId, categoryId } = this.props.location.state.product;
+    if (pCategoryId === "0") {
+      // 一级分类下的商品
+      const result = await reqCategory(categoryId);
+      const cName1 = result.data.name;
+      this.setState({ cName1 });
+    } else {
+      // 二级分类下分类商品名称
+      // const result1 = await reqCategory(pCategoryId);
+      // const result2 = await reqCategory(categoryId);
+      // const cName1 = result1.data.name;
+      // const cName2 = result2.data.name;
+      const results = await Promise.all([
+        reqCategory(pCategoryId),
+        reqCategory(categoryId),
+      ]);
+      const cName1 = results[0].data.name;
+      const cName2 = results[1].data.name;
+      this.setState({ cName1, cName2 });
+    }
+  }
   render() {
+    const {
+      name,
+      desc,
+      price,
+      imgs,
+      detail,
+    } = this.props.location.state.product;
+    const { cName1, cName2 } = this.state;
     const title = (
       <span>
-        <Icon type="arrow-left" />
+        <LinkButtom>
+          <Icon
+            type="arrow-left"
+            style={{ marginRight: 10, fontSize: 20 }}
+            onClick={() => this.props.history.goBack()}
+          />
+        </LinkButtom>
         <span>商品详情</span>
       </span>
     );
@@ -15,40 +59,40 @@ class ProductDetail extends Component {
         <List>
           <Item>
             <span className="left">商品名称：</span>
-            <span className="right">联想Thinkpad 翼480</span>
+            <span className="right">{name}</span>
           </Item>
           <Item>
             <span className="left">商品描述: </span>
-            <span className="right">年度重量级新品，联想Thinkpad 翼480</span>
+            <span className="right">{desc}</span>
           </Item>
           <Item>
             <span className="left">商品价格: </span>
-            <span className="right">66000元</span>
+            <span className="right">{price}元</span>
           </Item>
           <Item>
             <span className="left">所属分类: </span>
-            <span className="right">电脑--笔记本</span>
+            <span className="right">
+              {cName1} {cName2 ? "-->" + cName2 : ""}
+            </span>
           </Item>
           <Item>
             <span className="left">商品图片: </span>
             <span className="right">
-              <img
-                className="product-img"
-                src="http://localhost:5000/upload/image-1596607779276.jpg"
-                alt="pic"
-              />
-              <img
-                className="product-img"
-                src="http://localhost:5000/upload/image-1596607779276.jpg"
-                alt="pic"
-              />
+              {imgs.map((img) => (
+                <img
+                  className="product-img"
+                  src={BASE_IMG_URL + img}
+                  alt="img"
+                  key={img}
+                ></img>
+              ))}
             </span>
           </Item>
           <Item>
             <span className="left">商品详情: </span>
             <span
               dangerouslySetInnerHTML={{
-                __html: '<h1 style="color: red">商品详情的内容标题</h1>',
+                __html: detail,
               }}
             ></span>
           </Item>

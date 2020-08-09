@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { reqCategory, reqAddCategory, reqUpdateCategory } from "../../api";
+import { reqCategorys, reqAddCategory, reqUpdateCategory } from "../../api";
 import { Card, Table, Button, Icon, Modal, message } from "antd";
 import LinkButton from "../../components/link-button";
 import AddForm from "./add-form";
@@ -47,7 +47,7 @@ export default class Category extends Component {
   getCategory = async (parentId) => {
     this.setState({ loading: true });
     parentId = parentId || this.state.parentID;
-    let result = await reqCategory(parentId);
+    let result = await reqCategorys(parentId);
     this.setState({ loading: false });
     if (result.status === 0) {
       const categorys = result.data;

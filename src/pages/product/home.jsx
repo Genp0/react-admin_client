@@ -1,8 +1,12 @@
 import React, { Component } from "react";
-import { Card, Select, Button, Input, Icon, Table } from "antd";
+import { Card, Select, Button, Input, Icon, Table, message } from "antd";
 import LinkButton from "../../components/link-button";
 import { PAGE_SIZE } from "../../utils/constants";
-import { reqProducets, reqSearchProduct } from "../../api/index";
+import {
+  reqProducets,
+  reqSearchProduct,
+  reqUpdateStatus,
+} from "../../api/index";
 const Option = Select.Option;
 class Producthome extends Component {
   state = {
@@ -33,12 +37,18 @@ class Producthome extends Component {
       {
         width: 100,
         title: "状态",
-        dataIndex: "status",
-        render: (status) => {
+        // dataIndex: "status",
+        render: (product) => {
+          const { status, _id } = product;
           return (
             <span>
-              <Button type="primary">下架</Button>
-              <span>在售</span>
+              <Button
+                type="primary"
+                onClick={() => this.updateStatus(_id, status === 1 ? 2 : 1)}
+              >
+                {status === 1 ? "下架" : "上架"}
+              </Button>
+              <span>{status === 1 ? "在售" : "已下架"}</span>
             </span>
           );
         },
@@ -46,16 +56,26 @@ class Producthome extends Component {
       {
         width: 100,
         title: "操作",
-        render: (product) => (
-          <span>
-            <LinkButton>详情</LinkButton>
-            <LinkButton>修改</LinkButton>
-          </span>
-        ),
+        render: (product) => {
+          return (
+            <span>
+              {/* 将product对象使用state传递给目标 */}
+              <LinkButton
+                onClick={() =>
+                  this.props.history.push("/product/detail", { product })
+                }
+              >
+                详情
+              </LinkButton>
+              <LinkButton>修改</LinkButton>
+            </span>
+          );
+        },
       },
     ];
   };
   getProducts = async (pageNum) => {
+    this.pageNum = pageNum; // 保存pageNum让其他方法能看见
     this.setState({ loading: true });
     let result;
     const { searchName, searchType } = this.state;
@@ -74,11 +94,18 @@ class Producthome extends Component {
     if (result.status === 0) {
       // 取出分页数据，更新分页状态，显示分页列表
       const { list, total } = result.data;
-      console.log(list);
       this.setState({
         total,
         products: list,
       });
+    }
+  };
+  updateStatus = async (productId, status) => {
+    const result = await reqUpdateStatus(productId, status);
+    if (result.status === 0) {
+      console.log("aa");
+      message.success("更新商品成功");
+      this.getProducts(this.pageNum);
     }
   };
   componentWillMount() {
@@ -116,7 +143,10 @@ class Producthome extends Component {
       </span>
     );
     const extra = (
-      <Button type="primary">
+      <Button
+        type="primary"
+        onClick={() => this.props.history.push("/product/addupdate")}
+      >
         <Icon type="plus" />
         添加商品
       </Button>
