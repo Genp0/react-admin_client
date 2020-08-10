@@ -67,7 +67,13 @@ class Producthome extends Component {
               >
                 详情
               </LinkButton>
-              <LinkButton>修改</LinkButton>
+              <LinkButton
+                onClick={() =>
+                  this.props.history.push("/product/addUpdate", product)
+                }
+              >
+                修改
+              </LinkButton>
             </span>
           );
         },
