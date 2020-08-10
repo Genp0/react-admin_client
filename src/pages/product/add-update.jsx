@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { Card, Form, Input, Cascader, Upload, Button, Icon } from "antd";
 import LinkButtom from "../../components/link-button";
+import PicturesWall from "./pictures-wall";
 import { reqCategorys } from "../../api";
-import { number } from "prop-types";
-import { result } from "lodash";
 const { Item } = Form;
 const { TextArea } = Input;
 
@@ -16,6 +15,7 @@ class ProductAddUpdate extends Component {
       label: c.name,
       isLeaf: false,
     }));
+
     // 如果是一个二级分类的商品更新
     const { isUpdate, product } = this;
     const { pCategoryId, categoryId } = product;
@@ -30,7 +30,7 @@ class ProductAddUpdate extends Component {
       }));
       // 找到当前商品对应的一级option对象
       const targetOption = options.find(
-        (option) => option.value === categoryId
+        (option) => option.value === pCategoryId
       );
       // 关联到对应的一级option上去
       targetOption.children = childOptions;
@@ -50,7 +50,8 @@ class ProductAddUpdate extends Component {
         this.initOptions(categorys);
       } else {
         // 二级列表
-        return categorys; // 返回二级列表，当前async函数会烦的promise成功，value为categorys
+        console.log(categorys);
+        return categorys; // 返回二级列表，当前async函数promise成功，value为categorys
       }
     }
   };
@@ -72,7 +73,6 @@ class ProductAddUpdate extends Component {
   */
   loadData = async (selectedOptions) => {
     const targetOption = selectedOptions[0];
-    console.log(targetOption);
     // 显示loading效果
     targetOption.loading = true;
 
@@ -196,7 +196,7 @@ class ProductAddUpdate extends Component {
             )}
           </Item>
           <Item label="商品图片:">
-            <div>商品图片</div>
+            <PicturesWall />
           </Item>
           <Item label="商品详情:">
             <div>商品详情</div>
