@@ -32,7 +32,7 @@ class PicturesWall extends React.Component {
     if (imgs && imgs.length > 0) {
       fileList = imgs.map((img, index) => ({
         uid: -index,
-        name: "img.png",
+        name: img,
         status: "done",
         url: BASE_IMG_URL + img,
       }));
@@ -75,6 +75,7 @@ class PicturesWall extends React.Component {
       }
     } else if (file.status === "removed") {
       // 删除图片
+      console.log(file);
       const result = await reqDeleteImg(file.name);
       if (result.status === 0) {
         message.success("删除图片成功");

@@ -1,14 +1,5 @@
 import React, { Component } from "react";
-import {
-  Card,
-  Form,
-  Input,
-  Cascader,
-  Upload,
-  Button,
-  Icon,
-  message,
-} from "antd";
+import { Card, Form, Input, Cascader, Button, Icon, message } from "antd";
 import LinkButtom from "../../components/link-button";
 import PicturesWall from "./pictures-wall";
 import RichTextEditor from "./rich-text-editor";
@@ -168,6 +159,7 @@ class ProductAddUpdate extends Component {
     const { isUpdate, product } = this;
 
     const { pCategoryId, categoryId, imgs, detail } = product;
+
     // 用来接收级联分类ID的数组
     const categoryIds = [];
     if (isUpdate) {
