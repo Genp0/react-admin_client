@@ -63,6 +63,9 @@ export const reqRoles = () => ajax(BASE + "/manage/role/list");
 // 添加角色
 export const reqAddRole = (roleName) =>
   ajax(BASE + "/manage/role/add", { roleName }, "POST");
+//更新角色权限
+export const reqUpdateRole = (role) =>
+  ajax(BASE + "/manage/role/update", role, "POST");
 export const reqWeather = (city) => {
   return new Promise((resolve, reject) => {
     const url = `http://api.map.baidu.com/telematics/v3/weather?location=${city}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`;
