@@ -9,8 +9,8 @@ const BASE = "";
 export const reqLogin = (username, password) =>
   ajax(BASE + "/login", { username, password }, "POST");
 
-export const reqAddUser = (user) =>
-  ajax(BASE + "/manager/user/add", user, "POST");
+// export const reqAddUser = (user) =>
+//   ajax(BASE + "/manager/user/add", user, "POST");
 
 // 获取一级，二级分类列表
 export const reqCategorys = (parentId) =>
@@ -66,6 +66,15 @@ export const reqAddRole = (roleName) =>
 //更新角色权限
 export const reqUpdateRole = (role) =>
   ajax(BASE + "/manage/role/update", role, "POST");
+// 获取所有用户的列表
+export const reqUsers = () => ajax(BASE + "/manage/user/list");
+// 删除指定用户
+export const reqDeleteUser = (userId) =>
+  ajax(BASE + "/manage/user/delete", { userId }, "POST");
+// 添加用户 更新用户
+export const reqAddOrUpdateUser = (user) =>
+  ajax(BASE + "/manage/user/" + (user._id ? "update" : "add"), user, "POST");
+
 export const reqWeather = (city) => {
   return new Promise((resolve, reject) => {
     const url = `http://api.map.baidu.com/telematics/v3/weather?location=${city}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`;
