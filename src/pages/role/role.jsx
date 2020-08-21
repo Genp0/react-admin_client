@@ -6,6 +6,7 @@ import { reqRoles, reqAddRole, reqUpdateRole } from "../../api";
 import memoryUtils from "../../utils/memoryUtils";
 import { PAGE_SIZE } from "../../utils/constants";
 import { formateDate } from "../../utils/dateUtils";
+import storageUtils from "../../utils/storageUtils";
 
 export default class Role extends Component {
   state = {
@@ -83,8 +84,16 @@ export default class Role extends Component {
     // 请求更新
     const result = await reqUpdateRole(role);
     if (result.status === 0) {
-      message.success("设置权限成功");
-      this.setState({ roles: [...this.state.roles], isShowAuth: false });
+      // 如果当前更新的是自己的角色的权限，强制退出
+      if (role._id === memoryUtils.user.role_id) {
+        memoryUtils.user = {};
+        storageUtils.removeUser();
+        this.props.history.replace("/login");
+        message.success("当前用户角色权限修改了，重新登陆");
+      } else {
+        message.success("设置权限成功");
+        this.setState({ roles: [...this.state.roles], isShowAuth: false });
+      }
     } else {
       message.error("设置权限失败");
     }
@@ -119,7 +128,13 @@ export default class Role extends Component {
     return (
       <Card title={title}>
         <Table
-          rowSelection={{ type: "radio", selectedRowKeys: [role._id] }}
+          rowSelection={{
+            type: "radio",
+            selectedRowKeys: [role._id],
+            onSelect: (role) => {
+              this.setState({ role });
+            },
+          }}
           bordered
           rowKey="_id"
           dataSource={roles}

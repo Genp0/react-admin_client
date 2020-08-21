@@ -167,6 +167,7 @@ class Producthome extends Component {
             columns={this.columns}
             dataSource={products}
             pagination={{
+              current: this.pageNum,
               total,
               defaultPageSize: PAGE_SIZE,
               showQuickJumper: true,
