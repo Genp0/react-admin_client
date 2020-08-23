@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { increment, decrement } from "./redux/action";
-import {
-  INCREMENTIFODD,
-  incrementAsync,
-  INCREMENTASYNC,
-} from "./redux/action-type";
-
-export default class App extends Component {
+/* 
+UI组件
+  主要做显示与用户交互
+  代码中没有任何操作redux相关的代码
+*/
+export default class Counter extends Component {
   static propTypes = {
-    store: PropTypes.object.isRequired,
+    count: PropTypes.number.isRequired,
+    increment: PropTypes.func.isRequired,
+    decrement: PropTypes.func.isRequired,
   };
   constructor(props) {
     super(props);
@@ -20,26 +20,26 @@ export default class App extends Component {
   };
   increment = () => {
     const number = this.numberRef.current.value * 1;
-    this.props.store.dispatch(increment(number));
+    this.props.increment(number);
   };
   decrement = () => {
     const number = this.numberRef.current.value * 1;
-    this.props.store.dispatch(decrement(number));
+    this.props.decrement(number);
   };
   incrementIfOdd = () => {
     const number = this.numberRef.current.value * 1;
-    if (this.props.store.getState() % 2 === 1) {
-      this.props.store.dispatch(increment(number));
+    if (this.props.count % 2 === 1) {
+      this.props.increment(number);
     }
   };
   incrementAsync = () => {
     const number = this.numberRef.current.value * 1;
     setTimeout(() => {
-      this.props.store.dispatch(increment(number));
+      this.props.increment(number);
     }, 1000);
   };
   render() {
-    const count = this.props.store.getState();
+    const count = this.props.count;
     return (
       <div>
         <p>click {count} times</p>
