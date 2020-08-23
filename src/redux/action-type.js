@@ -1,4 +1,0 @@
-export const INCREMENT = "INCREMENT";
-export const DECREMENT = "DECREMENT";
-export const INCREMENTIFODD = "INCREMENTIFODD";
-export const INCREMENTASYNC = "INCREMENTASYNC";

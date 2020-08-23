@@ -1,15 +1,19 @@
 import React, { Component } from "react";
 import { reqWeather } from "../../api/index";
 import { Modal } from "antd";
+import { connect } from "react-redux";
 import { formateDate } from "../../utils/dateUtils";
 import { withRouter } from "react-router-dom";
-import memoryUtils from "../../utils/memoryUtils";
+import PropTypes from "prop-types";
 import "./index.less";
 import menuList from "../../config/menuConfig";
-import storageUtils from "../../utils/storageUtils";
 import LinkButton from "../../components/link-button";
+import { logout } from "../../redux/action";
 
 class Header extends Component {
+  static propTypes = {
+    headTitle: PropTypes.string.isRequired,
+  };
   state = {
     currentTime: formateDate(Date.now()), // 当前时间
     dayPictureUrl: "",
@@ -53,11 +57,7 @@ class Header extends Component {
     Modal.confirm({
       content: "确定要退出吗?",
       onOk: () => {
-        //删除保存的user数据
-        storageUtils.removeUser();
-        memoryUtils.user = {};
-        //跳转到login洁面
-        this.props.history.replace("/login");
+        this.props.logout();
       },
     });
   };
@@ -72,9 +72,10 @@ class Header extends Component {
     clearInterval(this.intervalId);
   }
   render() {
+    const { headTitle } = this.props;
     const { currentTime, dayPictureUrl, weather } = this.state;
-    const { username } = memoryUtils.user;
-    const title = this.getTitle();
+    const { username } = this.props.user;
+    const title = headTitle;
     return (
       <div className="header">
         <div className="header-top">
@@ -94,4 +95,10 @@ class Header extends Component {
   }
 }
 
-export default withRouter(Header);
+export default connect(
+  (state) => ({
+    headTitle: state.headTitle,
+    user: state.user,
+  }),
+  { logout }
+)(withRouter(Header));

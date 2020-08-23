@@ -1,12 +1,10 @@
 import React, { Component } from "react";
 import { Form, Input, Button, Icon, message } from "antd";
-
+import { connect } from "react-redux";
 import "./login.less";
 import { Redirect } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
-import { reqLogin } from "../../api/index";
-import memoryUtils from "../../utils/memoryUtils";
-import storageUtils from "../../utils/storageUtils";
+import { login } from "../../redux/action";
 
 /*
 登陆路由组件
@@ -19,16 +17,8 @@ class Login extends Component {
     validateFields(async (err, values) => {
       if (!err) {
         const { username, password } = values;
-        const result = await reqLogin(username, password);
-        if (result.status === 0) {
-          message.success("登录成功");
-          const { data: user } = result;
-          memoryUtils.user = user;
-          storageUtils.saveUser(user);
-          this.props.history.replace("/");
-        } else {
-          message.error(result.msg);
-        }
+        const { login } = this.props;
+        login(username, password);
       } else {
         console.log("校验失败");
       }
@@ -51,10 +41,12 @@ class Login extends Component {
     }
   };
   render() {
-    const { user } = memoryUtils;
+    const { user } = this.props;
     if (user && user._id) {
-      return <Redirect to="/" />;
+      return <Redirect to="/home" />;
     }
+    const errorMsg = user.errorMsg;
+
     const { Item } = Form;
     const { getFieldDecorator } = this.props.form;
     return (
@@ -64,6 +56,9 @@ class Login extends Component {
           <h1>React项目：后台系统管理</h1>
         </header>
         <section className="login-content">
+          <div className={errorMsg ? "error-msg show" : "error-msg"}>
+            {errorMsg}
+          </div>
           <h2>用户登录</h2>
           <Form
             onSubmit={this.handleSubmit}
@@ -130,4 +125,4 @@ class Login extends Component {
 
 const WrapLogin = Form.create()(Login);
 
-export default WrapLogin;
+export default connect((state) => ({ user: state.user }), { login })(WrapLogin);
